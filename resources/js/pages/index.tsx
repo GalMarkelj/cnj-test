@@ -4,9 +4,9 @@ import { Head, useForm, usePage } from '@inertiajs/react'
 import { useRoute } from 'ziggy-js'
 
 export default function Index() {
-    const { auth } = usePage<SharedData>().props
+    const { housings, stats } = usePage<SharedData>().props
     const route = useRoute()
-    const { data, setData, post, errors, processing, wasSuccessful, hasErrors } = useForm<{
+    const { setData, post, errors, processing, wasSuccessful, hasErrors } = useForm<{
         housing_document: undefined | File
     }>({
         housing_document: null,
@@ -16,6 +16,9 @@ export default function Index() {
         if (processing) return
         post(route('housing.document.upload'))
     }
+
+    console.log('housings', housings)
+    console.log('stats', stats)
 
     return (
         <>

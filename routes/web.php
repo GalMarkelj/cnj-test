@@ -1,13 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use \App\Http\Controllers\HousingController;
 
-Route::get('/', function () {
-    return Inertia::render('index');
-})->name('index');
-
-Route::post('/', [\App\Http\Controllers\HousingController::class, 'uploadDocument'])->name('housing.document.upload');
+Route::get('/', [HousingController::class, 'index'])->name('index');
+Route::post('/', [HousingController::class, 'uploadDocument'])->name('housing.document.upload');
 
 //Route::middleware(['auth', 'verified'])->group(function () {
 //    Route::get('dashboard', function () {

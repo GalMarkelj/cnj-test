@@ -7,9 +7,67 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class HousingController extends Controller
 {
+    public function index()
+    {
+        $housings = Housing::all();
+
+        $sumOfSoldHouses = 0;
+        $crimesByYear = [];
+        $averagePriceByYear = [];
+        $totalPrice = 0;
+        $totalCount = 0;
+
+        if ($housings->count() > 0) {
+            foreach ($housings as $row) {
+                $year = date('Y', strtotime($row['date']));
+
+                // Sum houses sold (ignoring null values)
+                if (!is_null($row['houses_sold'])) {
+                    $sumOfSoldHouses += $row['houses_sold'];
+                }
+
+                // Sum no_of_crimes by year (ignoring null values)
+                if (!is_null($row['no_of_crimes'])) {
+                    if (!isset($crimesByYear[$year])) {
+                        $crimesByYear[$year] = 0;
+                    }
+                    $crimesByYear[$year] += $row['no_of_crimes'];
+                }
+
+                // Sum average_price by year
+                if (!isset($averagePriceByYear[$year])) {
+                    $averagePriceByYear[$year] = ['sum' => 0, 'count' => 0];
+                }
+                $averagePriceByYear[$year]['sum'] += $row['average_price'];
+                $averagePriceByYear[$year]['count']++;
+
+                // Overall total price
+                $totalPrice += $row['average_price'];
+                $totalCount++;
+            }
+
+            // Calculate average price by year
+            foreach ($averagePriceByYear as $year => $data) {
+                $averagePriceByYear[$year] = $data['sum'] / $data['count'];
+            }
+        }
+
+        return Inertia::render('index', [
+            'housings' => $housings,
+            'stats' => $housings->count() == 0 ? null : [
+                'sum_of_sold_houses' => $sumOfSoldHouses,
+                'crimes_by_year' => $crimesByYear,
+                'average_price' => [
+                    'overall' => $totalCount > 0 ? $totalPrice / $totalCount : 0,
+                    'by_year' => $averagePriceByYear
+                ],
+            ]
+        ]);
+    }
     //
     public function uploadDocument(Request $request)
     {
