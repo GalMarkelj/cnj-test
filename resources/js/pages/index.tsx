@@ -6,11 +6,11 @@ import { useRoute } from 'ziggy-js'
 export default function Index() {
     const { auth } = usePage<SharedData>().props
     const route = useRoute()
-    const { data, setData, post, errors, processing } = useForm<{ housing_document: null | File }>({
+    const { data, setData, post, errors, processing, wasSuccessful, hasErrors } = useForm<{
+        housing_document: undefined | File
+    }>({
         housing_document: null,
     })
-
-    console.log('data', data)
 
     const handleSubmit = () => {
         if (processing) return
@@ -26,7 +26,7 @@ export default function Index() {
                     rel='stylesheet'
                 />
             </Head>
-            <div className='flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 lg:justify-center lg:p-8 dark:bg-stone-700'>
+            <div className='p-6'>
                 <form>
                     <Input
                         type='file'
@@ -36,8 +36,29 @@ export default function Index() {
                             setData({ housing_document: e.target.files[0] })
                         }}
                     />
-                    <Button onClick={handleSubmit}>Submit</Button>
+                    <div className='mt-3'>
+                        <Button className='bg-blue-700 p-1' onClick={handleSubmit}>
+                            Submit
+                        </Button>
+                    </div>
                 </form>
+                {processing && <div className='mt-3 text-yellow-300'>Loading...</div>}
+                {!processing && wasSuccessful && (
+                    <div className='mt-3 inline-block bg-green-600 p-1 text-white'>
+                        <strong>Success!</strong>
+                        <p>Data successfully saved into the database.</p>
+                    </div>
+                )}
+                {!processing && hasErrors && (
+                    <div className='mt-3 inline-block bg-red-600 p-1 text-white'>
+                        <strong>Error!</strong>
+                        <ul>
+                            {Object.entries(errors).map(([key, value]) => (
+                                <li key={key}>{value}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
             </div>
         </>
     )

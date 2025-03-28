@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 class HousingController extends Controller
 {
     //
-    public function uploadDocument(Request $request): JsonResponse
+    public function uploadDocument(Request $request)
     {
         $request->validate([
             'housing_document' => 'required|mimes:csv|max:203480'
@@ -39,6 +39,6 @@ class HousingController extends Controller
 
         fclose($handle);
 
-        return response()->json(['message' => 'CSV processed successfully']);
+        return back()->with('success', 'Data successfully stored to the database.');
     }
 }
