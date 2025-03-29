@@ -1,7 +1,8 @@
 import { Card } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Button, Input } from '@headlessui/react'
 import { Head, useForm, usePage } from '@inertiajs/react'
-import { useState } from 'react'
+import { FormEvent, useMemo, useState } from 'react'
 import { useRoute } from 'ziggy-js'
 
 type Stats = {
@@ -12,42 +13,44 @@ type Stats = {
         by_year_and_area: Record<number, Record<string, number>>
     }
 }
-type Duplicates = null | { date: string; area: string }[]
-export default function Index() {
+type Duplicates = { date: string; area: string }[]
+export default () => {
     const { stats } = usePage<{ stats: Stats | null }>().props
     const route = useRoute()
-    const { data, setData, post, processing, wasSuccessful } = useForm<{
+    const { setData, post, processing, wasSuccessful, hasErrors } = useForm<{
         housing_document: null | File
     }>({
         housing_document: null,
     })
-    const [duplicates, setDuplicates] = useState<Duplicates>(null)
-    const [errors, setErrors] = useState<[string, string][]>([])
 
-    const handleSubmit = () => {
+    const [duplicates, setDuplicates] = useState<Duplicates>([])
+    const [error, setError] = useState<null | string>(null)
+
+    const londonYearlyPrices = useMemo(() => {
+        if (!stats) return []
+        return Object.entries(stats.average_price.by_year_and_area)
+            .filter(([, data]) => !!data?.['city of london'])
+            .map(([year, data]) => ({
+                year,
+                price: data['city of london'].toLocaleString('en-US'),
+            }))
+    }, [stats])
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
         if (processing) return
 
-        setDuplicates(null)
-        setErrors([])
+        setDuplicates([])
+        setError(null)
 
         post(route('housing.document.upload'), {
-            onSuccess: (res) => {
-                console.log('success', res)
-            },
             onError: (err) => {
-                if (err?.duplicates) {
-                    setDuplicates(JSON.parse(err.duplicates))
-                    return
-                }
-                setErrors(Object.entries(err))
-                console.log('error!', err)
+                console.log('error', err)
+                setDuplicates(JSON.parse(err.duplicates))
+                setError(err.message)
             },
         })
     }
-
-    console.log('stats', stats)
-    console.log('duplicates', duplicates)
-    const isSubmittingDisabled = processing || data.housing_document === null
 
     return (
         <>
@@ -59,58 +62,65 @@ export default function Index() {
                 />
             </Head>
             <div className='p-6'>
-                <form>
-                    <Input
-                        type='file'
-                        accept='.csv'
-                        onChange={(e) => {
-                            if (e.target.files === null) return
-                            setData({ housing_document: e.target.files[0] })
-                        }}
-                    />
-                    <div className='mt-3'>
-                        <Button
-                            className={`bg-blue-${isSubmittingDisabled ? '300' : '700'} p-1`}
-                            onClick={handleSubmit}
-                            disabled={isSubmittingDisabled}
-                        >
-                            Submit
-                        </Button>
-                    </div>
-                </form>
+                <Card className='mt-6 bg-stone-300 pl-3 text-black'>
+                    <form onSubmit={handleSubmit}>
+                        <Input
+                            type='file'
+                            accept='.csv'
+                            onChange={(e) => {
+                                if (e.target.files === null) return
+                                setData({ housing_document: e.target.files[0] })
+                            }}
+                            required
+                        />
 
-                {processing && <div className='mt-3 text-yellow-300'>Loading...</div>}
+                        <div className='mt-3 flex items-center space-x-2'>
+                            <Checkbox id='confirmation' required />
+                            <label
+                                htmlFor='confirmation'
+                                className='text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+                            >
+                                Save to database
+                            </label>
+                        </div>
+
+                        <div className='mt-3'>
+                            <Button
+                                className={`bg-blue-${processing ? '300' : '700'} p-1 text-white`}
+                                disabled={processing}
+                                type='submit'
+                            >
+                                Submit
+                            </Button>
+                        </div>
+                    </form>
+                </Card>
+
+                {processing && <div className='mt-6 text-yellow-300'>Loading...</div>}
                 {!processing && wasSuccessful && (
-                    <div className='mt-3 inline-block bg-green-600 p-1 text-white'>
+                    <div className='mt-6 inline-block bg-green-600 p-1 text-white'>
                         <strong>Success!</strong>
                         <p>Data successfully saved into the database.</p>
                     </div>
                 )}
-                {!processing && errors.length > 0 && (
-                    <div className='mt-3 inline-block bg-red-600 p-1 text-white'>
-                        <strong>Error!</strong>
-                        <ul>
-                            {Object.entries(errors).map(([key, value]) => (
-                                <li key={key}>{value}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-                {!processing && duplicates && (
-                    <div className='mt-3 inline-block bg-orange-600 p-1 text-white'>
-                        <strong>Warning</strong>
-                        <p>
-                            There were duplicated records in the uploaded document. All records were
-                            successfully stored in the database except the following ones:
-                        </p>
-                        <ul>
-                            {duplicates.map(({ date, area }) => (
-                                <li key={`${date}-${area}`}>
-                                    {date} - {area}
-                                </li>
-                            ))}
-                        </ul>
-                        <p>Review this records and you can later upload only the fixed ones.</p>
+                {!processing && hasErrors && (
+                    <div className='mt-6 inline-block bg-red-600 p-1 text-white'>
+                        <strong>
+                            Error! The data store was not successful due to the following errors:
+                        </strong>
+                        <div>{error}</div>
+                        {duplicates.length > 0 && (
+                            <div className='mt-2'>
+                                <strong>Duplicated records:</strong>
+                                <ul>
+                                    {duplicates.map(({ date, area }) => (
+                                        <li key={`${date}-${area}`}>
+                                            {date} - {area}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -132,13 +142,15 @@ export default function Index() {
                             </div>
                             <div>
                                 <strong>Avg price by year in London area</strong>
-                                {Object.entries(stats.average_price.by_year_and_area)
-                                    .filter(([, data]) => !!data?.['city of london'])
-                                    .map(([year, data]) => (
+                                {londonYearlyPrices.length > 0 ? (
+                                    londonYearlyPrices.map(({ year, price }) => (
                                         <div key={year}>
-                                            {year}: {data['city of london'].toLocaleString('en-US')}
+                                            {year}: {price}
                                         </div>
-                                    ))}
+                                    ))
+                                ) : (
+                                    <div>There is no data for London area.</div>
+                                )}
                             </div>
                         </>
                     )}
