@@ -3,8 +3,9 @@
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use App\Models\Housing;
+use Illuminate\Support\Facades\Storage;
 
-test('fails when a non-CSV file is uploaded', function () {
+it('fails when a non-CSV file is uploaded', function () {
     $file = UploadedFile::fake()->create('document.pdf', 100);
 
     $response = $this->post(route('housing.document.upload'), [
@@ -14,7 +15,7 @@ test('fails when a non-CSV file is uploaded', function () {
     $response->assertSessionHasErrors(['housing_document']);
 });
 
-test('fails when CSV file has missing required fields', function () {
+it('fails when CSV file has missing required fields', function () {
     $csvContent = "date,area,average_price,code,houses_sold,no_of_crimes,borough_flag\n" .
         "2023-01-01,London,,LDN,10,5,1\n"; // Missing average_price
 
@@ -28,7 +29,7 @@ test('fails when CSV file has missing required fields', function () {
 });
 
 // date and area are tied together and unique
-test('fails when uploading duplicate data', function () {
+it('fails when uploading duplicate data', function () {
     $data = [
         'uuid' => (string)Str::ulid(),
         'date' => '2023-01-01',
@@ -55,7 +56,7 @@ test('fails when uploading duplicate data', function () {
     $this->assertDatabaseMissing('housing', $data);
 });
 
-test('uploading a valid CSV document and store records in the database', function () {
+it('uploads a valid CSV document and store records in the database', function () {
     // Create a temporary CSV file
     $csvContent = "date,area,average_price,code,houses_sold,no_of_crimes,borough_flag\n" .
         "2025-01-01,London,500000,LDN,10,5,1\n";
@@ -80,4 +81,18 @@ test('uploading a valid CSV document and store records in the database', functio
         'no_of_crimes' => 5,
         'borough_flag' => 1,
     ]);
+});
+
+it('deletes the document after processing', function () {
+    Storage::fake('local');
+
+    $csvContent = "date,area,average_price,code,houses_sold,no_of_crimes,borough_flag\n" .
+        "2023-01-01,London,500000,LDN,10,5,1\n";
+    $file = UploadedFile::fake()->createWithContent('housing.csv', $csvContent);
+
+    $this->post(route('housing.document.upload'), [
+        'housing_document' => $file,
+    ]);
+
+    Storage::assertMissing('uploads/housing_documents/housing.csv');
 });

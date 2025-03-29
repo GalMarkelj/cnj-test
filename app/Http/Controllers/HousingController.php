@@ -63,7 +63,6 @@ class HousingController extends Controller
         }
 
         return Inertia::render('index', [
-            'housings' => $records,
             'stats' => $recordsCount == 0 ? null : [
                 'sum_of_sold_houses' => $sumOfSoldHouses,
                 'crimes_by_year' => $crimesByYear,
