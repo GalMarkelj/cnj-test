@@ -34,9 +34,6 @@ jobs:
       - name: Install Node Dependencies
         run: npm ci
 
-      - name: Build Assets
-        run: npm run build
-
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -48,3 +45,6 @@ jobs:
 
       - name: Tests
         run: ./vendor/bin/pest
+
+      - name: Build Assets
+        run: npm run build
