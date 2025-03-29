@@ -21,6 +21,9 @@ return new class extends Migration
             $table->float('no_of_crimes')->nullable();
             $table->integer('borough_flag');
             $table->timestamps();
+
+            // Define a unique composite constraint
+            $table->unique(['date', 'area']);
         });
     }
 
