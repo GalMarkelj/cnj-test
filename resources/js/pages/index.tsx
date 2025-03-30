@@ -45,8 +45,7 @@ export default () => {
 
         post(route('housing.document.upload'), {
             onError: (err) => {
-                console.log('error', err)
-                setDuplicates(JSON.parse(err.duplicates))
+                if (err?.duplicates) setDuplicates(JSON.parse(err.duplicates))
                 setError(err.message)
             },
         })
@@ -86,7 +85,7 @@ export default () => {
 
                         <div className='mt-3'>
                             <Button
-                                className={`bg-blue-${processing ? '300' : '700'} p-1 text-white`}
+                                className={`bg-blue-700 p-1 text-white`}
                                 disabled={processing}
                                 type='submit'
                             >
