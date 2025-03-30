@@ -72,6 +72,7 @@ export default [
             'tailwind.config.js',
             'resources/js/ziggy.js',
             'tests/cypress',
+            'cypress.config.cjs',
         ],
     },
     prettier, // Turn off all rules that might conflict with Prettier
