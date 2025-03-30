@@ -14,6 +14,7 @@ For detailed documentation on the housing feature, please refer to the [docs/hou
 Ensure you have the following installed on your system:
 
 - **Docker** (with Docker Compose)
+- **Composer**
 - **Laravel Sail** (included in the project)
 - **Node.js** and **npm** (for frontend development)
 
@@ -44,20 +45,48 @@ cd <project-directory>
 cp .env.example .env
 ```
 
-### 3️⃣ Start Docker Containers
+### 3️⃣ Install Backend Dependencies
+
+```sh
+composer install
+```
+
+### 4️⃣ Start Docker Containers
 
 ```sh
 sail up
 ```
 
-### 4️⃣ Run the following commands
+### 5️⃣ Run key generation and migration
 
 ```sh
 sail artisan key:generate
 sail artisan migrate
 ```
 
-### 5️⃣ Install Dependencies
+### 6️⃣ Setup testing environment
+
+#### ⚠️ Important
+
+Tests are running on a separate testing database. After you copy your .env to .env.testing, set the following fields:
+
+```.dotenv
+APP_ENV=testing
+DB_DATABASE=testing
+```
+
+Everything else should be the same as in the .env, except the APP_KEY that is generated bellow.
+
+```sh
+cp .env.example .env.testing
+
+sail artisan key:generate --env=testing
+sail artisan migrate --env=testing
+
+cp .env.testing .env.cypress
+```
+
+### 7️⃣ Install Frontend Dependencies
 
 For the frontend dependencies:
 
@@ -65,7 +94,15 @@ For the frontend dependencies:
 sail npm install
 ```
 
-### 6️⃣ Access the Application
+### 8️⃣ Run Frontend
+
+For the frontend dependencies:
+
+```sh
+sail npm run dev
+```
+
+### 9️⃣ Access the Application
 
 Once the setup is complete, open your browser and go to:
 
@@ -76,13 +113,6 @@ http://localhost
 ---
 
 ## 🧪 Running Tests
-
-### Create testing environment configuration and only set `DB_DATABASE=testing`.
-
-```sh
-cp .env .env.testing
-cp .env .env.cypress
-```
 
 The project includes **PEST** for backend testing and **Cypress** for end-to-end testing.
 

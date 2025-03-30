@@ -27,6 +27,7 @@ before(() => {
 })
 
 after(() => {
+    cy.refreshDatabase()
     cy.artisan('config:clear', {}, { log: false })
     cy.task('activateLocalEnvFile', {}, { log: false })
 })
