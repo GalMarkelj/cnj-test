@@ -134,7 +134,8 @@ If a duplicate row is detected, the response contains an error message with dupl
 
 ## How to Use
 
-1. **Upload a CSV File**
+1. **Upload a CSV File** (I have added a valid and a original non valid fiels to the root of the project, `valid.csv`
+   and `original-non-valid.csv`)
 
     - Select a `.csv` file with the correct format.
     - Confirm you want to store the records in the database with the checkbox.
