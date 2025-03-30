@@ -48,3 +48,6 @@ jobs:
 
       - name: Pest Tests
         run: ./vendor/bin/pest
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
