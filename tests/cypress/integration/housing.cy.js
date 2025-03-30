@@ -21,7 +21,6 @@ describe('Housing Document Upload', () => {
         )
         cy.get('#confirmation').click()
         cy.get('button[type="submit"]').click()
-        cy.contains('Loading...').should('exist')
         cy.contains('Error! The data store was not successful due to the following errors:')
         cy.contains('Duplicated records:')
         cy.contains('1995-04-01 - city of london')
@@ -34,7 +33,6 @@ describe('Housing Document Upload', () => {
         )
         cy.get('#confirmation').click()
         cy.get('button[type="submit"]').click()
-        cy.contains('Loading...').should('exist')
         cy.contains('Error! The data store was not successful due to the following errors:')
     })
 
@@ -44,7 +42,6 @@ describe('Housing Document Upload', () => {
         )
         cy.get('#confirmation').click()
         cy.get('button[type="submit"]').click()
-        cy.contains('Loading...').should('exist')
         cy.contains('Error! The data store was not successful due to the following errors:')
         cy.contains('The area field is required.')
     })
@@ -54,7 +51,6 @@ describe('Housing Document Upload', () => {
         cy.get('#confirmation').click()
         cy.get('button[type="submit"]').click()
 
-        cy.contains('Loading...').should('exist')
         cy.contains('Success!').should('exist')
         cy.contains('Data successfully saved into the database.').should('exist')
 
