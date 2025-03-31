@@ -88,13 +88,21 @@ cp .env.testing .env.cypress
 
 ### 7️⃣ Install Frontend Dependencies
 
-For the frontend dependencies:
+#### ⚠️ Important - delete cypress from the package.json first and install it without sail!
+
+I'll add a command in the next step.
 
 ```sh
 sail npm install
 ```
 
-### 8️⃣ Run Frontend
+### 8️⃣ Install cypress without sail
+
+```sh
+npm install cypress --save-dev
+```
+
+### 9️⃣ Run Frontend
 
 For the frontend dependencies:
 
@@ -102,7 +110,7 @@ For the frontend dependencies:
 sail npm run dev
 ```
 
-### 9️⃣ Access the Application
+### 🔟 Access the Application
 
 Once the setup is complete, open your browser and go to:
 
