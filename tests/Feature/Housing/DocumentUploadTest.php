@@ -31,7 +31,6 @@ it('fails when CSV file has missing required fields', function () {
 // date and area are tied together and unique
 it('fails when uploading duplicate data', function () {
     $data = [
-        'uuid' => (string)Str::ulid(),
         'date' => '2023-01-01',
         'area' => 'London',
         'average_price' => 500000,

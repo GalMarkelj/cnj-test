@@ -133,7 +133,6 @@ class HousingController extends Controller
                     $duplicates[] = ['date' => $row[0], 'area' => $row[1]];
                 } else {
                     Housing::create([
-                        'uuid' => (string)Str::ulid(),
                         'date' => $row[0],
                         'area' => $row[1],
                         'average_price' => $row[2],

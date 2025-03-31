@@ -10,7 +10,6 @@ it('returns null stats when there are no records', function () {
 
 it('returns correct statistics and records (with all the stats present)', function () {
     Housing::create([
-        'uuid' => (string)Str::ulid(),
         'date' => '2023-01-01',
         'area' => 'London',
         'average_price' => 500000,
@@ -32,7 +31,6 @@ it('returns correct statistics and records (with all the stats present)', functi
 
 it('returns correct statistics and records (with some of the stats missing)', function () {
     Housing::create([
-        'uuid' => (string)Str::ulid(),
         'date' => '2023-01-01',
         'area' => 'London',
         'average_price' => 500000,
