@@ -9,6 +9,8 @@
 /vendor
 .env
 .env.backup
+.env.testing
+.env.cypress
 .env.production
 .phpactor.json
 .phpunit.result.cache
@@ -22,3 +24,4 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+tests/cypress/screenshots
