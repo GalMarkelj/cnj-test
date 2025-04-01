@@ -96,13 +96,7 @@ I'll add a command in the next step.
 sail npm install
 ```
 
-### 8️⃣ Install cypress without sail
-
-```sh
-npm install cypress --save-dev
-```
-
-### 9️⃣ Run Frontend
+### 8️⃣ Run Frontend
 
 For the frontend dependencies:
 
@@ -110,7 +104,7 @@ For the frontend dependencies:
 sail npm run dev
 ```
 
-### 🔟 Access the Application
+### 9️⃣ Access the Application
 
 Once the setup is complete, open your browser and go to:
 
@@ -141,16 +135,46 @@ sail test
 
 ### Run Cypress Tests
 
-You can do this with the interface:
+#### ⚠️ Cypress needs additional packages to run properyly.
+
+You have to go on to the container, and install the required dependencies.
+
+1. Get id of the container. Look for something like `laravel.test`.
 
 ```sh
-npx cypress open
+docker ps
 ```
 
-Or in headless more (in terminal):
+2. Enter in to the container
 
 ```sh
-npx cypress run
+docker exec -it [CONTAINER_ID] bash
+```
+
+3. Update the system there and install the required deps
+
+```sh
+apt-get update
+
+apt-get install -y \
+  libgtk-3-0 \
+  libgbm1 \
+  libnotify4 \
+  libgdk-pixbuf2.0-0 \
+  libcups2 \
+  libxss1 \
+  libnss3 \
+  xvfb \
+  libpangocairo-1.0-0 \
+  libpangoft2-1.0-0
+  
+ exit
+```
+
+Run the tests
+
+```sh
+sail npx cypress run
 ```
 
 ---
